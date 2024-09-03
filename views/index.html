@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <form action="/add" method="GET">
+            <input type="text" name="product" id="1">
+            <input type="submit">
+        </form>
+        <h1>{{ .Title }}</h1>
+        {{ range .ingredients }}
+            <p>{{ . }}</p>
+        {{ end }}
+    </body>
+</html>
