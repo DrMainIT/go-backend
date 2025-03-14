@@ -14,7 +14,7 @@ import (
 type Urls struct {
 	gorm.Model
 	Name     string
-	approved bool
+	Approved bool
 }
 
 func Config(key string) string {
@@ -34,7 +34,7 @@ func queryName(db *gorm.DB,approved bool) []string {
 	}
 	links := []string{}
 	for _, url := range urls {
-		if url.approved == approved {
+		if url.Approved == approved {
 		links = append(links, url.Name)
 		}
 	}
@@ -61,7 +61,7 @@ func main() {
 		// get values from the form
 		url := c.FormValue("url")
 
-		db.Create(&Urls{Name: url, approved: false})
+		db.Create(&Urls{Name: url,Approved: false})
 		//names := queryName(db)
 		return c.Render("index", fiber.Map{})
 	})
@@ -81,10 +81,21 @@ func main() {
 	app.Get("/admin", func(c fiber.Ctx) error {
 		names := queryName(db,false)
 
-		return c.Render("index", fiber.Map{
+		return c.Render("admin", fiber.Map{
 			"urls": names,
 			"Title":       "Articles to buy",
 		})
 	})
+	app.Post("/admin/accept", func(c fiber.Ctx) error{
+		names := queryName(db,false)
+		url := c.FormValue("link")
+		fmt.Print(url)
+		db.Model(&Urls{}).Where("Name = ?", url).Update("approved", true)
+		return c.Render("admin", fiber.Map{
+			"urls": names,
+			"Title": "Articles to buy",
+		})
+	})
+	
 	app.Listen(":3000")
 }
