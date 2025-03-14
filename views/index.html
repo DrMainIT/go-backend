@@ -2,11 +2,11 @@
 <html>
     <body>
         <form action="/add" method="GET">
-            <input type="text" name="product" id="1">
+            <input type="text" name="url" id="1">
             <input type="submit">
         </form>
         <h1>{{ .Title }}</h1>
-        {{ range .ingredients }}
+        {{ range .urls }}
             <p>{{ . }}</p>
         {{ end }}
     </body>
