@@ -8,7 +8,7 @@ import (
 	"github.com/gofiber/template/html/v2"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"gorm.io/gorm"  
 )
 
 type Urls struct {
@@ -55,15 +55,23 @@ func main() {
 	db.AutoMigrate(&Urls{})
 	app.Get("/", func(c fiber.Ctx) error {
 		// list all elements
-		return c.Render("index", fiber.Map{})
+		urls := queryName(db,true)
+		return c.JSON(fiber.Map{
+			"Title": "dake",
+			"urls":  urls,
+		})
+		// return c.Render("index", fiber.Map{
+		//	"Title": "dake",
+		//	"urls": urls,
+		//})
 	})
 	app.Get("/add", func(c fiber.Ctx) error {
 		// get values from the form
 		url := c.FormValue("url")
 
 		db.Create(&Urls{Name: url,Approved: false})
-		//names := queryName(db)
-		return c.Render("index", fiber.Map{})
+		return nil
+	
 	})
 
 	app.Get("/login", func(c fiber.Ctx) error {
