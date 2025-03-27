@@ -100,6 +100,6 @@ func main() {
 		return c.Redirect().To(Config("FRONTEND_URL")+ "/admin")
 	})
 	
-	app.Listen(":8080")
+	app.Listen(":80")
 }
 
