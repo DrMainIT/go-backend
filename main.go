@@ -19,15 +19,6 @@ type Urls struct {
 	Approved bool
 }
 
-func Config(key string) string {
-	err := godotenv.Load(".env")
-	if err != nil {
-		return "ok"
-	}
-	return os.Getenv(key)
-
-}
-
 func queryName(db *gorm.DB,approved bool) []string {
 	var urls []Urls
 	result := db.Find(&urls)
@@ -54,16 +45,18 @@ func main() {
 	app.Use(cors.New())
 	
 	app.Use(logger.New())
-	// Or extend your config for customization
-	app.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"https://gofiber.io", "https://gofiber.net",Config("FRONTEND_URL")},
-		AllowHeaders: []string{"Origin", "Content-Type", "Accept"},
-	}))
+	
 	err := godotenv.Load(".env")
 	if err != nil {
 		fmt.Print("Error loading .env file")
 	}
-	db, err := gorm.Open(postgres.Open(Config("POSTGRES_URL")), &gorm.Config{})
+	// Or extend your config for customization
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"https://gofiber.io", "https://gofiber.net", os.Getenv("FRONTEND_URL")},
+		AllowHeaders: []string{"Origin", "Content-Type", "Accept"},
+	}))
+
+	db, err := gorm.Open(postgres.Open(os.Getenv("DB_URL")), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
@@ -80,7 +73,7 @@ func main() {
 		url := c.FormValue("url")
 
 		db.Create(&Urls{Name: url,Approved: false})
-		return c.Redirect().To(Config("FRONTEND_URL")+"/thankyou")
+		return c.Redirect().To(os.Getenv("FRONTEND_URL")+"/thankyou")
 	
 	})
 
@@ -97,9 +90,10 @@ func main() {
 		if password == os.Getenv("PASSWORD") {
 			db.Model(&Urls{}).Where("Name = ?", url).Update("approved", true)
 		}
-		return c.Redirect().To(Config("FRONTEND_URL")+ "/admin")
+		return c.Redirect().To(os.Getenv("FRONTEND_URL")+ "/admin")
 	})
 	
-	app.Listen(":8080")
+	app.Listen(":8000")
 }
+
 
